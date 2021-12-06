@@ -3,18 +3,29 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
-import os
+import numpy as np
+import requests
+import json
+
+import helpers
+
+url = 'https://raw.githubusercontent.com/jwillekes18/duplicateDetection/master/TVs-all-merged.json'
+
+def describe_data(url):
+    resp = requests.get(url)
+    data = json.loads(resp.text)
+    print(f'Important output for understanding the data and code below:')
+    print(f'Amount of keys in dataset: {len(data.keys())}')
+    descriptions = helpers.count_descriptions(data)
+    print(f'Total number of descriptions in keys: {descriptions}')
+    return data
+
+def clean_data(data):
 
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    path = os.getcwd()
-    print(f'Hi, {path}, how are you?')  # Press ⌘F8 to toggle the breakpoint.
+    return
 
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('Jelle')
+    describe_data(url)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
