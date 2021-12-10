@@ -2,14 +2,6 @@ import re
 
 
 def create_binary(data):
-    """
-    Transforms a list of items to a binary vector product representation, using model words in the title, decimals in
-    the title and feature values, and count feature keys.
-
-    :param data: a list of items
-    :return: a binary vector product representation
-    """
-
     # List of common count features.
     common_counts = ["Component", "HDMI", "USB", "Composite", "PC Input"]
 
