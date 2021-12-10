@@ -1,6 +1,6 @@
-import numpy as np
-import pandas as pd
+
 import re
+
 
 def count_descriptions(data: dict) -> int:
     """Calculate number of descriptions of the dataset
@@ -34,7 +34,7 @@ def get_titles(models: dict) -> dict:
     return titles
 
 
-def standardize_titles(titles: dict) -> dict:
+def std_titles(titles: dict) -> dict:
     expr = '[a-zA-Z0-9.]*[0-9]+[a-zA-Z0-9.]*'
     for key in titles.keys():
         titles[key] = titles[key].replace('"','inch')
