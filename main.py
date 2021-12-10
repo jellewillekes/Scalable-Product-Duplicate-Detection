@@ -1,43 +1,43 @@
 import numpy as np
-import requests
-import json
+from math import comb
 
-import helpers
+from clean_data import get_data, standardize_data, duplicates_matrix, calc_bin_vector #common_words
+from minhash import minhash
+from lsh import lsh
 
 #'https://raw.githubusercontent.com/jwillekes18/duplicateDetection/master/TVs-all-merged.json'
 
-url = 'https://raw.githubusercontent.com/jwillekes18/ML-Porto-Seguro-s-Safe-Drive-Prediction/main/TVs-all-merged.json'
-resp = requests.get(url)
-data = json.loads(resp.text)
 
+def main():
+    url = 'https://raw.githubusercontent.com/jwillekes18/ML-Porto-Seguro-s-Safe-Drive-Prediction/main/TVs-all-merged.json'
+    data = get_data(url)
 
-def describe_data(data):
-    print(f'Description of the data:')
-    print(f'Amount of keys in dataset: {len(data.keys())}')
-    descriptions = helpers.count_descriptions(data)
-    print(f'Total number of descriptions in keys: {descriptions}')
-    return data
+    std_data = standardize_data(data)
 
+    #freq_words = common_words(std_data)
+    #freq_words = freq_words[:15] # use 15 most frequent words for Binary Vector
 
-def clean_data(data):
-    models = helpers.number_models(data)
-    #print(f'Example of model (first model) and its descriptions elements: {models[0].keys()}')
-    titles = helpers.get_titles(models)
-    std_titles = helpers.std_titles(titles)
-    return std_titles
+    duplicates = duplicates_matrix(std_data)
+    binary_vector = calc_bin_vector(std_data)
+    n = round(round(0.5 * len(binary_vector)) / 100) * 100
 
+    #Perform MinHashing
+    signature_matrix = minhash(binary_vector, n)
 
-def create_model_words(data):
-    std_titles = clean_data(data)
-    model_words = []
-    for key in std_titles.keys():
-        title_words = std_titles[key]
-        for word in title_words:
-            if word not in model_words:
-                model_words.append(word)
-    print(model_words)
-    return model_words
+    #Perform LSH with threshold at t=0.01
+    t = 0.01
+    candidates = lsh(signature_matrix, t)
 
+    comparisons = np.sum(candidates)/2
+    frac_of_comp = comparisons / comb(len(std_data), 2)
+
+    correct = np.where(duplicates+candidates==2, 1, 0)
+    n_correct = np.sum(correct)/2
+
+    pq = n_correct / comparisons
+    pc = n_correct / (np.sum(duplicates) / 2)
+
+    f1_star = 2 * pq * pc / (pq + pc)
 
 if __name__ == '__main__':
-    create_model_words(data)
+    main()

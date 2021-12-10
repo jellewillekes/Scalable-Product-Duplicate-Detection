@@ -1,6 +1,6 @@
-import numpy as np
-import pandas as pd
+
 import re
+
 
 def count_descriptions(data: dict) -> int:
     """Calculate number of descriptions of the dataset
