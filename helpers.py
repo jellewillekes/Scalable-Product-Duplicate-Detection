@@ -1,7 +1,3 @@
-
-import re
-
-
 def count_descriptions(data: dict) -> int:
     """Calculate number of descriptions of the dataset
 
