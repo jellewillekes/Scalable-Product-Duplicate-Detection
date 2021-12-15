@@ -24,10 +24,9 @@ def minhash(binary_vec, n):
         hash_params[i, 0] = a
         hash_params[i, 1] = b
 
-    # Initialize signature matrix to infinity for each element.
     signature = np.full((n, c), np.inf)
 
-    # Loop through the binary vector representation matrix once, to compute the signature matrix.
+    # Loop through binary vector and calculate signature matrix
     for row in range(1, r + 1):
         # Compute each of the n random hashes once for each row.
         e = np.ones(n)
@@ -37,7 +36,6 @@ def minhash(binary_vec, n):
 
         for i in range(n):
             # Update column j if and only if it contains a one and its current value is larger than the hash value for
-            # the signature matrix row i.
             updates = np.where(binary_vec[row - 1] == 0, np.inf, row_hash[i])
             signature[i] = np.where(updates < signature[i], row_hash[i], signature[i])
     return signature.astype(int)

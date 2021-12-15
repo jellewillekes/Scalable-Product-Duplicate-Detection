@@ -22,7 +22,7 @@ def standardize_data(data):
     # Declare common value representations to be replaced by the last value of the list.
     #expr = '[a-zA-Z0-9.]*[0-9]+[a-zA-Z0-9.]*'
 
-    # Standardize Data.
+    # Standardize titles of dataset
     std_data = []
     for modelID in data:
         for incident in data[modelID]:
@@ -49,7 +49,7 @@ def standardize_data(data):
 
 
 def duplicates_matrix(std_data):
-    # Set all values zero initially and add 1 if row and column correspond
+    # Set all values zero initially and add 1 if row and column values are similar
     duplicates = np.zeros((len(std_data), len(std_data)))
     for row in range(len(std_data)):
         model_row = std_data[row]["modelID"]
@@ -63,7 +63,7 @@ def duplicates_matrix(std_data):
 
 
 def calc_bin_vector(std_data):
-    # List of common count features.
+    # List of most frequently used words in titles and features map
     freq_words = ["Aspect Ratio", "UPC", "HDMI", "Component", "Video", "Contrast", "Composite", "Speakers", "HDMI", "USB"]
 
     model_words = dict()
@@ -76,30 +76,30 @@ def calc_bin_vector(std_data):
             "(?:^|(?<=[ \[\(]))([a-zA-Z0-9]*(?:(?:[0-9]+[^0-9\., ()]+)|(?:[^0-9\., ()]+[0-9]+)|(?:([0-9]+\.[0-9]+)["
             "^0-9\., ()]+))[a-zA-Z0-9]*)(?:$|(?=[ \)\]]))",
             incident["title"])
-        incident_mw = []
+        incident_model_word = []
         for match in model_title:
             if match[0] != '':
-                incident_mw.append(match[0])
+                incident_model_word.append(match[0])
             else:
-                incident_mw.append(match[1])
+                incident_model_word.append(match[1])
 
         # Find model words in the key-value pairs.
         features = incident["featuresMap"]
         for key in features:
             value = features[key]
 
-            # Find decimals.
-            # ([0-9]+\.[0-9]+) matches any (numeric) - . - (numeric) - (non-numeric) combination (i.e., decimals).
+            # Find decimals
+            # ([0-9]+\.[0-9]+) matches any numeric, and non-numeric combination. In this case we look for decimals.
             # [a-zA-Z0-9]* matches any alphanumeric character (zero or more times).
-            mw_decimal = re.findall("([0-9]+\.[0-9]+)[a-zA-Z]*", value)
-            for decimal in mw_decimal:
-                incident_mw.append(decimal)
+            decimal_word = re.findall("([0-9]+\.[0-9]+)[a-zA-Z]*", value)
+            for decimal in decimal_word:
+                incident_model_word.append(decimal)
 
-            # Group some common features.
-            key_mw = key
+            # Group the common features
+            key_word = key
             for feature in freq_words:
                 if feature.lower() in key.lower():
-                    key_mw = feature
+                    key_word = feature
                     break
 
             # Find the count value and construct a model word by appending the count to the key.
@@ -107,21 +107,21 @@ def calc_bin_vector(std_data):
                 counts = re.findall("^[0-9]+", value)
                 for count in counts:
                     if count is not None:
-                        incident_mw.append(count + key_mw)
+                        incident_model_word.append(count + key_word)
 
-        # Loop through all identified model words and update the binary vector product representation.
-        for mw in incident_mw:
-            if mw in model_words:
-                # Set index for model word to one.
-                row = model_words[mw]
+        # Update the binary vector for product represenation.
+        for model_word in incident_model_word:
+            if model_word in model_words:
+                # Set all model words to 1
+                row = model_words[model_word]
                 binary_vec[row][i] = 1
             else:
-                # Add model word to the binary vector, and set index to one.
+                # Add model words to binary vectors and set to 1.
                 binary_vec.append([0] * len(std_data))
                 binary_vec[len(binary_vec) - 1][i] = 1
 
                 # Add model word to the dictionary.
-                model_words[mw] = len(binary_vec) - 1
+                model_words[model_word] = len(binary_vec) - 1
     return binary_vec
 
 """

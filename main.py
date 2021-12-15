@@ -5,14 +5,12 @@ import matplotlib.pyplot as plt
 from clean_data import get_data, standardize_data, duplicates_matrix, calc_bin_vector
 from lsh import lsh, minhash
 
-#'https://raw.githubusercontent.com/jwillekes18/duplicateDetection/master/TVs-all-merged.json'
+'https://raw.githubusercontent.com/jwillekes18/duplicateDetection/master/TVs-all-merged.json'
 
 
 def main():
-    url = 'https://raw.githubusercontent.com/jwillekes18/ML-Porto-Seguro-s-Safe-Drive-Prediction/main/TVs-all-merged.json'
+    url = 'https://raw.githubusercontent.com/jwillekes18/duplicateDetection/master/TVs-all-merged.json'
     data = get_data(url)
-
-    bootstraps = 5
 
     std_data = standardize_data(data)
 
@@ -53,18 +51,16 @@ def main():
 
         comparisons_total.append(comparisons)
         frac_of_comp_total.append(frac_of_comp)
-        pq_total = pq_total.append(pq)
-        pc_total = pc_total.append(pc)
-        f1_star_total = f1_star_total.append(f1_star)
+        #pq_total = pq_total.append(pq)
+        #pc_total = pc_total.append(pc)
+        #f1_star_total = f1_star_total.append(f1_star)
         print(comparisons, frac_of_comp, pq, pc, f1_star)
 
-    plt.figure(figsize=(20,10))
-    plt.plot(thresholds, pq_total)
-    plt.xlabel('Fraction comparisons')
-    plt.ylabel('Pair Quality')
-    plt.show()
-
-    print("hello world")
+    #plt.figure(figsize=(20,10))
+    #plt.plot(comparisons_total, f1_star_total)
+    #plt.xlabel('Fraction comparisons')
+    #plt.ylabel('F1*')
+    #plt.show()
 
 
 if __name__ == '__main__':
